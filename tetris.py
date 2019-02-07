@@ -1,5 +1,6 @@
-import pygame
 import random
+
+import pygame
 
 """
 10 x 20 square grid
@@ -18,7 +19,6 @@ block_size = 30
 
 top_left_x = (s_width - play_width) // 2
 top_left_y = s_height - play_height
-
 
 # SHAPE FORMATS
 
@@ -126,6 +126,8 @@ T = [['.....',
 
 shapes = [S, Z, I, O, J, L, T]
 shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128)]
+
+
 # index 0 - 6 represent shape
 
 
@@ -142,12 +144,12 @@ class Piece(object):
 
 
 def create_grid(locked_positions={}):
-    grid = [[(0,0,0) for x in range(10)] for x in range(20)]
+    grid = [[(0, 0, 0) for x in range(10)] for x in range(20)]
 
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            if (j,i) in locked_positions:
-                c = locked_positions[(j,i)]
+            if (j, i) in locked_positions:
+                c = locked_positions[(j, i)]
                 grid[i][j] = c
     return grid
 
@@ -169,7 +171,7 @@ def convert_shape_format(shape):
 
 
 def valid_space(shape, grid):
-    accepted_positions = [[(j, i) for j in range(10) if grid[i][j] == (0,0,0)] for i in range(20)]
+    accepted_positions = [[(j, i) for j in range(10) if grid[i][j] == (0, 0, 0)] for i in range(20)]
     accepted_positions = [j for sub in accepted_positions for j in sub]
     formatted = convert_shape_format(shape)
 
@@ -195,27 +197,31 @@ def get_shape():
     return Piece(5, 0, random.choice(shapes))
 
 
-def draw_text_middle(text, size, color, surface):
+def draw_text_middle(text, size, color, surface, offset=0):
     font = pygame.font.SysFont('comicsans', size, bold=True)
     label = font.render(text, 1, color)
 
-    surface.blit(label, (top_left_x + play_width/2 - (label.get_width() / 2), top_left_y + play_height/2 - label.get_height()/2))
+    surface.blit(label, (
+    top_left_x + play_width / 2 - (label.get_width() / 2),
+    (top_left_y + play_height / 2 - label.get_height() / 2) + offset))
 
 
 def draw_grid(surface, row, col):
     sx = top_left_x
     sy = top_left_y
     for i in range(row):
-        pygame.draw.line(surface, (128,128,128), (sx, sy+ i*30), (sx + play_width, sy + i * 30))  # horizontal lines
+        pygame.draw.line(surface, (128, 128, 128), (sx, sy + i * 30),
+                         (sx + play_width, sy + i * 30))  # horizontal lines
         for j in range(col):
-            pygame.draw.line(surface, (128,128,128), (sx + j * 30, sy), (sx + j * 30, sy + play_height))  # vertical lines
+            pygame.draw.line(surface, (128, 128, 128), (sx + j * 30, sy),
+                             (sx + j * 30, sy + play_height))  # vertical lines
 
 
 def clear_rows(grid, locked):
     # need to see if row is clear the shift every other row above down one
 
     inc = 0
-    for i in range(len(grid)-1,-1,-1):
+    for i in range(len(grid) - 1, -1, -1):
         row = grid[i]
         if (0, 0, 0) not in row:
             inc += 1
@@ -232,42 +238,49 @@ def clear_rows(grid, locked):
             if y < ind:
                 newKey = (x, y + inc)
                 locked[newKey] = locked.pop(key)
+        print('Achievement Unlocked!')
 
 
 def draw_next_shape(shape, surface):
     font = pygame.font.SysFont('comicsans', 30)
-    label = font.render('Next Shape', 1, (255,255,255))
+    label = font.render('Next Incarnation', 1, (255, 255, 255))
 
     sx = top_left_x + play_width + 50
-    sy = top_left_y + play_height/2 - 100
+    sy = top_left_y + play_height / 2 - 100
     format = shape.shape[shape.rotation % len(shape.shape)]
 
     for i, line in enumerate(format):
         row = list(line)
         for j, column in enumerate(row):
             if column == '0':
-                pygame.draw.rect(surface, shape.color, (sx + j*30, sy + i*30, 30, 30), 0)
+                pygame.draw.rect(surface, shape.color, (sx + j * 30, sy + i * 30, 30, 30), 0)
 
-    surface.blit(label, (sx + 10, sy- 30))
+    surface.blit(label, (sx + 10, sy - 30))
 
 
 def draw_window(surface):
-    surface.fill((0,0,0))
+    surface.fill((0, 0, 0))
     # Tetris Title
     font = pygame.font.SysFont('comicsans', 60)
-    label = font.render('TETRIS', 1, (255,255,255))
+    label = font.render('FPT', 1, (255, 255, 255))
 
     surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 30))
 
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            pygame.draw.rect(surface, grid[i][j], (top_left_x + j* 30, top_left_y + i * 30, 30, 30), 0)
+            pygame.draw.rect(surface, grid[i][j], (top_left_x + j * 30, top_left_y + i * 30, 30, 30), 0)
 
     # draw grid and border
     draw_grid(surface, 20, 10)
     pygame.draw.rect(surface, (255, 0, 0), (top_left_x, top_left_y, play_width, play_height), 5)
     # pygame.display.update()
 
+
+def interact():
+    s = input('name your movement: ')
+    if s:
+        return s.strip()
+    return ' '
 
 def main():
     global grid
@@ -283,6 +296,8 @@ def main():
     fall_time = 0
 
     while run:
+        result = interact()
+
         fall_speed = 0.27
 
         grid = create_grid(locked_positions)
@@ -290,46 +305,72 @@ def main():
         clock.tick()
 
         # PIECE FALLING CODE
-        if fall_time/1000 >= fall_speed:
+        if fall_time / 1000 >= fall_speed:
             fall_time = 0
             current_piece.y += 1
             if not (valid_space(current_piece, grid)) and current_piece.y > 0:
                 current_piece.y -= 1
                 change_piece = True
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-                pygame.display.quit()
-                quit()
+        if result[0] == 'r':
+            print('You move right...')
+            current_piece.x -= 1
+            if not valid_space(current_piece, grid):
+                current_piece.x += 1
+        elif result[0] == 'l':
+            print('You move left...')
+            current_piece.x += 1
+            if not valid_space(current_piece, grid):
+                current_piece.x -= 1
+        elif result == 'spin':
+            print('A whirlwind from the mountains twists your position...')
+            current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
+            if not valid_space(current_piece, grid):
+                current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
+        elif result == 'attack!':
+            print('You advance at full force towards the enemy!')
+            print('''
+      /| ________________
+O|===|* >________________>
+      \|
+            ''')
+            while valid_space(current_piece, grid):
+                current_piece.y += 1
+            current_piece.y -= 1
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    current_piece.x -= 1
-                    if not valid_space(current_piece, grid):
-                        current_piece.x += 1
-
-                elif event.key == pygame.K_RIGHT:
-                    current_piece.x += 1
-                    if not valid_space(current_piece, grid):
-                        current_piece.x -= 1
-                elif event.key == pygame.K_UP:
-                    # rotate shape
-                    current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
-                    if not valid_space(current_piece, grid):
-                        current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
-
-                if event.key == pygame.K_DOWN:
-                    # move shape down
-                    current_piece.y += 1
-                    if not valid_space(current_piece, grid):
-                        current_piece.y -= 1
-
-                '''if event.key == pygame.K_SPACE:
-                    while valid_space(current_piece, grid):
-                        current_piece.y += 1
-                    current_piece.y -= 1
-                    print(convert_shape_format(current_piece))'''  # todo fix
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         run = False
+        #         pygame.display.quit()
+        #         quit()
+        #     print(result)
+        #     if result or event.type == pygame.KEYDOWN:
+        #         if result == 'l' or event.key == pygame.K_LEFT:
+        #             current_piece.x -= 1
+        #             if not valid_space(current_piece, grid):
+        #                 current_piece.x += 1
+        #
+        #         elif result == 'r' or event.key == pygame.K_RIGHT:
+        #             current_piece.x += 1
+        #             if not valid_space(current_piece, grid):
+        #                 current_piece.x -= 1
+        #         elif event.key == pygame.K_UP:
+        #             # rotate shape
+        #             current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
+        #             if not valid_space(current_piece, grid):
+        #                 current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
+        #
+        #         if event.key == pygame.K_DOWN:
+        #             # move shape down
+        #             current_piece.y += 1
+        #             if not valid_space(current_piece, grid):
+        #                 current_piece.y -= 1
+        #
+        #         '''if event.key == pygame.K_SPACE:
+        #             while valid_space(current_piece, grid):
+        #                 current_piece.y += 1
+        #             current_piece.y -= 1
+        #             print(convert_shape_format(current_piece))'''  # todo fix
 
         shape_pos = convert_shape_format(current_piece)
 
@@ -359,7 +400,7 @@ def main():
         if check_lost(locked_positions):
             run = False
 
-    draw_text_middle("You Lost", 40, (255,255,255), win)
+    draw_text_middle("You Died", 40, (255, 255, 255), win)
     pygame.display.update()
     pygame.time.delay(2000)
 
@@ -367,8 +408,14 @@ def main():
 def main_menu():
     run = True
     while run:
-        win.fill((0,0,0))
-        draw_text_middle('Press any key to begin.', 60, (255, 255, 255), win)
+        win.fill((0, 0, 0))
+        draw_text_middle('Press any key to begin', 60, (255, 255, 255), win)
+        draw_text_middle('your adventure...', 60, (255, 255, 255), win, 50)
+        draw_text_middle('Here are the instructions:', 60, (255, 255, 255), win, 100)
+        draw_text_middle('Press L for right:', 60, (255, 255, 255), win, 150)
+        draw_text_middle('Press R for Left:', 60, (255, 255, 255), win, 200)
+        draw_text_middle('Type Attack! to drop:', 60, (255, 255, 255), win, 250)
+
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
