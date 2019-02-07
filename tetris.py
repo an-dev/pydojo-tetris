@@ -323,7 +323,7 @@ def main():
             if not valid_space(current_piece, grid):
                 current_piece.x -= 1
         elif result == 'spin':
-            print('A whirlwind from the mountains twists your position...')
+            print('A whirlwind from the mountains of Azeroth pushes you away...')
             current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
             if not valid_space(current_piece, grid):
                 current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
@@ -411,10 +411,11 @@ def main_menu():
         win.fill((0, 0, 0))
         draw_text_middle('Press any key to begin', 60, (255, 255, 255), win)
         draw_text_middle('your adventure...', 60, (255, 255, 255), win, 50)
-        draw_text_middle('Here are the instructions:', 60, (255, 255, 255), win, 100)
-        draw_text_middle('Press L for right:', 60, (255, 255, 255), win, 150)
-        draw_text_middle('Press R for Left:', 60, (255, 255, 255), win, 200)
-        draw_text_middle('Type Attack! to drop:', 60, (255, 255, 255), win, 250)
+        draw_text_middle('The instructions are from', 60, (255, 255, 255), win, 100)
+        draw_text_middle('the blocks perspective!:', 60, (255, 255, 255), win, 150)
+        draw_text_middle('Press L for right:', 60, (255, 255, 255), win, 200)
+        draw_text_middle('Press R for Left:', 60, (255, 255, 255), win, 250)
+        draw_text_middle('Type Attack! to drop:', 60, (255, 255, 255), win, 300)
 
         pygame.display.update()
         for event in pygame.event.get():
