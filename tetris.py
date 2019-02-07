@@ -203,7 +203,7 @@ def draw_text_middle(text, size, color, surface, offset=0):
 
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2),
-    (top_left_y + play_height / 2 - label.get_height() / 2) + offset))
+    (top_left_y + play_height / 2 - label.get_height() / 2) + offset - 200))
 
 
 def draw_grid(surface, row, col):
@@ -279,7 +279,7 @@ def draw_window(surface):
 def interact():
     s = input('name your movement: ')
     if s:
-        return s.strip()
+        return s.strip().lower()
     return ' '
 
 def main():
